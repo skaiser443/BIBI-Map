@@ -16,27 +16,8 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2thaXNlcmljcHJiIiwiYSI6ImNpa2U3cGN1dDAwMnl1c
 		 data: 'bibi.geojson',
 		 cluster: true,
 		 clusterMaxZoom: 14,
-		 clusterRadius: 100
+		 clusterRadius: 100,
 	 });
-     
-//     map.addLayer({
-//		 id: 'ephemera',
-//		 type: 'circle',
-//		 source: 'map_genera',
-//		 'source-layer': 'map_genera',
-//		 interactive: true,
-//		 paint: {
-//			 'circle-radius': 4,
-//			 'circle-color': {
-//				 property: 'GENUS',
-//				 type: 'categorical',
-//				 stops: [
-//				   ['GAMMARUS', '#000000'],
-//				   ['PELTOPERLA', '#bad9c8'],
-//				   ['EPHEMERA', '#d96704']]
-//			 }
-//		 }
-//	 });
      
      map.addLayer({
 		 id: 'non-cluster-markers',
@@ -44,14 +25,21 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2thaXNlcmljcHJiIiwiYSI6ImNpa2U3cGN1dDAwMnl1c
 		 source: 'bibi',
 		 interactive: true,
 		 paint: {
-			 'circle-color': '#000000',
-			 'circle-radius': 6
-		 }
+			 'circle-radius': 4,
+			 'circle-color': {
+				 property: 'GENUS',
+				 type: 'categorical',
+				 stops: [
+				   ['GAMMARUS', '#000000'],
+				   ['PELTOPERLA', '#bad9c8'],
+				   ['EPHEMERA', '#d96704']]
+			 }
+		 },
 	 });
 	 
 	 var layers = [
 	     [50, '#f28cb1'],
-		 [10, '#f1f075'],
+		 [20, '#f1f075'],
 		 [0, '#51bbd6']
 	 ];
 	 
@@ -66,7 +54,7 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2thaXNlcmljcHJiIiwiYSI6ImNpa2U3cGN1dDAwMnl1c
 			 },
 			 filter: i == 0 ?
 			    [">=", "point_count", layer[0]] :
-			        ["all,",
+			        ["all",
 				        [">=", "point_count", layer[0]],
 					    ["<", "point_count", layers[i - 1][0]]]
 		 });
@@ -84,7 +72,21 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoic2thaXNlcmljcHJiIiwiYSI6ImNpa2U3cGN1dDAwMnl1c
                  ],
              "text-size": 12
          }
-    });	 
+     });
+
+    map.on("click", function(e) {
+		var features = map.queryRenderedFeatures(e.point);
+		
+		if (!features.length) {
+			return;
+		}
+	    var feature = features[0];
+	    var ttip = new mapboxgl.Popup()
+		  .setLngLat(feature.geometry.coordinates)
+		  .setHTML("Genus: " + feature.properties.GENUS)
+		  .addTo(map);
+		});
+ 
 
 //     map.addLayer({
 //		 id: 'peltoperla',
